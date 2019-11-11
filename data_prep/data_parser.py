@@ -4,7 +4,6 @@ import os
 import utils.dir_utils as dir_utils
 import pandas as pd
 
-
 # Used to create the fasta files and gene information files for future use.
 # for each organism file
 for file in glob.glob(os.path.join(dir_utils.ANNOTATION_DIR, '*.txt')):
@@ -20,12 +19,10 @@ for file in glob.glob(os.path.join(dir_utils.ANNOTATION_DIR, '*.txt')):
     organismFolder = os.path.join(dir_utils.CONVERTED_DATA_DIR, name)
     organismGeneFolder = os.path.join(organismFolder, "genes")
     organismGeneInfoFolder = os.path.join(organismFolder, "gene_info")
-    try:
-        os.makedirs(organismFolder)
-        os.makedirs(organismGeneFolder)
-        os.makedirs(organismGeneInfoFolder)
-    except FileExistsError:
-        print("Already Made!")
+    
+    dir_utils.generate_dir(organismFolder)
+    dir_utils.generate_dir(organismGeneFolder)
+    dir_utils.generate_dir(organismGeneInfoFolder)
 
     # for each gene row, make fasta for gene file.
     gene = 1
@@ -59,5 +56,5 @@ for file in glob.glob(os.path.join(dir_utils.ANNOTATION_DIR, '*.txt')):
                 "strand, " + strand + "\n" + "function_data, " + function_data + "\n" + "aliases, " + aliases + "\n" +
                 "figfam, " + figfam + "\n" + "evidence_codes, " + evidence_codes + "\n"
                 + "nucleotide_sequence, " + nucleotide_sequence + "\n" + "aa_sequence, " + aa_sequence)
-        print(f"{gene} / {df}")
+        print(f"{gene}")
         gene += 1

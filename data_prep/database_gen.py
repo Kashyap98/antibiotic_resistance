@@ -11,4 +11,4 @@ for organism in os.listdir(dir_utils.CONVERTED_DATA_DIR):
     os.system("type *.fasta> AllFasta.fasta")
     shutil.move(os.path.join(os.getcwd(), "AllFasta.fasta"), currentOrganism)
     os.chdir(currentOrganism)
-    os.system('makeblastdb -in AllFasta.fasta -title ' + organism + ' -out ' + organism + ' -dbtype nucl')
+    os.system(f'makeblastdb -in AllFasta.fasta -title {organism} -out {organism} -dbtype nucl')

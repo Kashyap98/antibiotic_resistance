@@ -2,11 +2,7 @@ import csv
 import os
 import utils.dir_utils as dir_utils
 import pandas as pd
-
-
-def make_directories(name):
-    folderString = os.path.join(dir_utils.SORTED_DATA_DIR, name)
-    os.makedirs(folderString)
+import utils.gen_utils as gen_utils
 
 
 def cp_fixer(cp):
@@ -44,16 +40,13 @@ def organize_organisms(cp, antibiotic, antibiotic_type):
         indFile.close()
 
 
-try:
-    make_directories("FOSF")
-    make_directories("CIPRO")
-    make_directories("AMOXO")
-    make_directories("SULF")
-    make_directories("CEPRO")
-except FileExistsError:
-    print("Folders already made!")
+dir_utils.generate_dir(dir_utils.FOSF_DIR)
+dir_utils.generate_dir(dir_utils.CIPRO_DIR)
+dir_utils.generate_dir(dir_utils.AMOXO_DIR)
+dir_utils.generate_dir(dir_utils.CEPRO_DIR)
+dir_utils.generate_dir(dir_utils.SULF_DIR)
 
-data_source = os.path.join(os.getcwd(), "antibiotic_resistance_csv.csv")
+data_source = os.path.join(os.getcwd(), "..", "antibiotic_resistance_csv.csv")
 data = list(csv.reader(open(data_source, 'r'), delimiter=','))
 df = pd.DataFrame.from_records(data)
 
