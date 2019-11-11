@@ -26,7 +26,7 @@ def get_gene_info(drug, phenotype):
     allOrgs = list(organismFile.iloc[:, 0])
     targetOrganism = str(allOrgs.pop(0))
 
-    ## Get file with all the Genes
+    # Get file with all the Genes
     geneFile = pd.read_csv(os.getcwd() + "\\sorted_data\\" + drug + "\\" + phenotype + "_UniqueGenes.csv")
     allGenes = list(geneFile.iloc[:, 0])
     print("Target Organism: ", targetOrganism)

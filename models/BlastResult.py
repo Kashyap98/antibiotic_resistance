@@ -18,7 +18,7 @@ class BlastResult:
         self.match_length = int(blast_data[1])
         self.bitscore = int(float(bitscore_fixer(blast_data, blast_data[2])))
         self.target_gene = target_gene
-        self.blast_gene = Gene(blast_organism, self.gene_name)
+        self.blast_gene = Gene(blast_organism, self.gene_name, get_info=True)
         self.blast_in_threshold = self.threshold_check()
 
     def threshold_check(self):

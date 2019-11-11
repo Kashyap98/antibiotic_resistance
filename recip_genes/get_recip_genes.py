@@ -78,8 +78,8 @@ def get_recips(drug, phenotype):
 
             if blast_data.target_gene.name == blast_data.blast_gene.name:
                 matchRatio = float(round(int(blast_data.match_length) / int(current_gene.length), 2))
-                gene_info_writer(target_org, gene, blast_data.bitscore,
-                                 matchRatio, blast_data.gene_name, organism, output_file)
+                output_file.write_recip_info(target_org, gene, blast_data.bitscore,
+                                             matchRatio, blast_data.gene_name, organism)
                 if gene in final_gene_counter:
                     final_gene_counter[gene] += 1
                 else:
