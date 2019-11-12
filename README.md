@@ -12,11 +12,9 @@ database_gen - Used to compile all the fasta files generated above into 1 fasta 
 
 -BLASTing (in order).
 
-GeneMatcher - Blasts all the genes of 1 organism against all the organisms of the same phenotype. This gives us a list of all recip genes.
+get_recip_genes - Blasts all the genes of 1 organism against all the organisms of the same phenotype. This gives us a list of all recip genes.
 
-uniqueChecker - This blasts all the recip genes from above against all the organisms of the opposite phenotypes. If there is any match the gene is removed as it is not unique to the phenotype.
-
-commonGenes - This is used to create a csv with the information of the genes that are all found in the same phenotype but are not found in any organisms of the opposite phenotype.
+unique_checker - This blasts all the recip genes from above against all the organisms of the opposite phenotypes. If there is any match the gene is removed as it is not unique to the phenotype.
 
 -Misc.
 

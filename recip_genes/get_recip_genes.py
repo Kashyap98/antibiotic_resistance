@@ -37,7 +37,7 @@ def get_recips(drug, phenotype):
     genes_removed = {}
     count = 0
     for organism in all_organisms:
-        ## For each other genome we want to compare to, Recip BLAST those genes and only keep the ones are the same
+        # For each other genome we want to compare to, Recip BLAST those genes and only keep the ones are the same
         organism_name = str(organism)
         print(organism_name)
         print(str(count) + "/" + str(len(all_organisms)))
@@ -45,7 +45,7 @@ def get_recips(drug, phenotype):
         database_path = recip_organism_dirs.database_dir
 
         for gene in all_genes:
-            ## First blast the first organism gene against the database of the gene in the list.
+            # First blast the first organism gene against the database of the gene in the list.
 
             current_gene = Gene(target_org, gene)
             blast_data = b.blast(current_gene, database_path, organism_name)
@@ -77,9 +77,8 @@ def get_recips(drug, phenotype):
                 continue
 
             if blast_data.target_gene.name == blast_data.blast_gene.name:
-                matchRatio = float(round(int(blast_data.match_length) / int(current_gene.length), 2))
-                output_file.write_recip_info(target_org, gene, blast_data.bitscore,
-                                             matchRatio, blast_data.gene_name, organism)
+                output_file.write_recip_info(target_org, gene, blast_data.bitscore, blast_data.match_ratio,
+                                             blast_data.gene_name, organism)
                 if gene in final_gene_counter:
                     final_gene_counter[gene] += 1
                 else:
@@ -101,15 +100,15 @@ def get_recips(drug, phenotype):
             final_genes.append(key)
     total = pd.DataFrame(final_genes)
     total.to_csv(os.path.join(os.getcwd(), "sorted_data", drug, phenotype + "_RecipGenes.csv"), index=False)
-    geneCountdf = pd.DataFrame(gene_count)
-    geneCountdf.to_csv(os.path.join(os.getcwd(), "sorted_data", drug, phenotype + "_GeneCount.csv"), index=False)
+    gene_count_df = pd.DataFrame(gene_count)
+    gene_count_df.to_csv(os.path.join(os.getcwd(), "sorted_data", drug, phenotype + "_GeneCount.csv"), index=False)
     removed_genes_df = pd.DataFrame(genes_removed, index=[0])
     removed_genes_df.to_csv(os.path.join(os.getcwd(), "sorted_data", drug, f"{phenotype}_GenesNotMatched.csv"))
 
 
-phenotypes = ["res"]
-drugs = ["CIPRO"]
+PHENOTYPES = ["res"]
+DRUGS = ["CIPRO"]
 
-for drug in drugs:
-    for phenotype in phenotypes:
-        get_recips(drug, phenotype)
+for DRUG in DRUGS:
+    for PHENOTYPE in PHENOTYPES:
+        get_recips(DRUG, PHENOTYPE)

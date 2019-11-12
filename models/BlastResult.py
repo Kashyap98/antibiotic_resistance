@@ -20,6 +20,7 @@ class BlastResult:
         self.target_gene = target_gene
         self.blast_gene = Gene(blast_organism, self.gene_name, get_info=True)
         self.blast_in_threshold = self.threshold_check()
+        self.match_ratio = float(round(int(self.match_length) / int(self.target_gene.length), 2))
 
     def threshold_check(self):
         if self.bitscore >= 1000 and self.blast_gene.upper_length <= self.target_gene.length and self.blast_gene.lower_length <= self.target_gene.length:
