@@ -40,6 +40,8 @@ class DrugDirs:
         self.target_phenotype_file = os.path.join(self.drug_dir, f"{phenotype}.csv")
         self.op_phenotype_file = os.path.join(self.drug_dir, f"{phenotype}.csv")
         self.variations_dir = os.path.join(self.drug_dir, "variations")
+        self.trees_dir = os.path.join(self.variations_dir, "trees")
+        self.alignments_dir = os.path.join(self.variations_dir, "alignments")
 
     def set_opposite_phenotype_file(self, op_phenotype):
         self.op_phenotype_file = os.path.join(self.drug_dir, f"{op_phenotype}.csv")

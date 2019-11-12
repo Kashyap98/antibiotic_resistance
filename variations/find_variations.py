@@ -5,6 +5,7 @@ import pandas as pd
 from models import Blast as b
 from models.BlastResult import BlastResult
 from models.Gene import Gene
+from utils import dir_utils, gen_utils, output_util
 
 
 def findstem(arr):
@@ -73,22 +74,20 @@ def get_lcs(original_gene_data, opposite_gene_data):
 
 
 def find_interesting(drug, phenotype):
-    op_phenotype = "res"
-    if phenotype == "res":
-        op_phenotype = "sus"
-
-    all_organisms_list, recip_genes_df, recip_genes_data = get_organisms_genes_data_by_phenotype(drug, phenotype)
+    op_phenotype = gen_utils.get_op_phenotype(phenotype)
+    drug_dirs = dir_utils.DrugDirs(drug, phenotype)
+    all_organisms_list, recip_genes_df, recip_genes_data = gen_utils.get_organisms_genes_data_by_phenotype(drug,
+                                                                                                           phenotype)
     recip_genes = list(recip_genes_df["0"])
     all_genes_length = len(recip_genes)
 
-    opposite_organisms_list, opposite_genes_df, opposite_genes_data = get_organisms_genes_data_by_phenotype(drug,
-                                                                                                            op_phenotype)
+    opposite_organisms_list, opposite_genes_df, opposite_genes_data = gen_utils.get_organisms_genes_data_by_phenotype(
+        drug, op_phenotype)
     opposite_genes = list(opposite_genes_df["0"])
-    opposite_genes_length = len(opposite_genes)
 
     original_organism = all_organisms_list.pop(0)
     opposite_organism = opposite_organisms_list.pop(0)
-    opposite_organism_db_path = os.path.join(os.getcwd(), "converted_data", opposite_organism, opposite_organism)
+    opposite_organism_dirs = dir_utils.OrganismDirs(opposite_organism)
     all_recip_genes = generate_recip_genes_mappings(recip_genes, original_organism, recip_genes_data)
     all_opposite_genes = generate_recip_genes_mappings(opposite_genes, opposite_organism, opposite_genes_data)
 
@@ -102,34 +101,35 @@ def find_interesting(drug, phenotype):
         original_gene = Gene(original_organism, original_gene_name.replace(".fasta", ""), get_info=True)
         print(f"{len(final_df)} / {all_genes_length}")
 
-        blast_data = b.blast(original_gene.fasta_file, opposite_organism_db_path)
-        if len(blast_data) > 1:
-            blast_result = BlastResult(blast_data)
-            opposite_blast_gene = Gene(opposite_organism, blast_result.gene_name, get_info=True)
-            opposite_gene_name = opposite_blast_gene.name + ".fasta"
-            if opposite_gene_name in opposite_genes:
-                res_lcs, sus_lcs, combined_lcs = get_lcs(all_recip_genes[original_gene_name], all_opposite_genes[opposite_gene_name])
-                final_df = final_df.append({f"{phenotype}_organism": original_organism,
-                                            f"{phenotype}_gene": original_gene_name,
-                                            f"{op_phenotype}_organism": opposite_organism,
-                                            f"{op_phenotype}_gene": opposite_gene_name,
-                                            f"{phenotype}_length": len(original_gene.aa_sequence),
-                                            f"{op_phenotype}_length": len(opposite_blast_gene.aa_sequence),
-                                            f"{phenotype}_lcs": round(res_lcs / len(original_gene.aa_sequence), 2),
-                                            f"{op_phenotype}_lcs": round(sus_lcs / len(opposite_blast_gene.aa_sequence), 2),
-                                            "combined_lcs": round(combined_lcs / len(original_gene.aa_sequence), 2),
-                                            f"{phenotype}_function": original_gene.function_data,
-                                            f"{op_phenotype}_function": opposite_blast_gene.function_data},
-                                           ignore_index=True)
+        blast_data = b.blast(original_gene.fasta_file, opposite_organism_dirs.database_dir, opposite_organism)
+        if not blast_data:
+            continue
 
-                opposite_genes.remove(opposite_gene_name)
+        opposite_blast_gene = Gene(opposite_organism, blast_data.blast_gene.name, get_info=True)
+        opposite_gene_name = opposite_blast_gene.name + ".fasta"
+        if opposite_gene_name in opposite_genes:
+            res_lcs, sus_lcs, combined_lcs = get_lcs(all_recip_genes[original_gene_name], all_opposite_genes[opposite_gene_name])
+            final_df = final_df.append({f"{phenotype}_organism": original_organism,
+                                        f"{phenotype}_gene": original_gene_name,
+                                        f"{op_phenotype}_organism": opposite_organism,
+                                        f"{op_phenotype}_gene": opposite_gene_name,
+                                        f"{phenotype}_length": len(original_gene.aa_sequence),
+                                        f"{op_phenotype}_length": len(opposite_blast_gene.aa_sequence),
+                                        f"{phenotype}_lcs": round(res_lcs / len(original_gene.aa_sequence), 2),
+                                        f"{op_phenotype}_lcs": round(sus_lcs / len(opposite_blast_gene.aa_sequence), 2),
+                                        "combined_lcs": round(combined_lcs / len(original_gene.aa_sequence), 2),
+                                        f"{phenotype}_function": original_gene.function_data,
+                                        f"{op_phenotype}_function": opposite_blast_gene.function_data},
+                                       ignore_index=True)
 
-    final_df.to_csv(os.path.join(os.getcwd(), "sorted_data", drug, phenotype + "_Variations.csv"))
+            opposite_genes.remove(opposite_gene_name)
+
+    final_df.to_csv(os.path.join(drug_dirs.drug_dir, f"{phenotype}_Variations.csv"))
 
 
-phenotypes = ["res"]
-drugs = ["CIPRO"]
+PHENOTYPES = ["res"]
+DRUGS = ["CIPRO"]
 
-for drug in drugs:
-    for phenotype in phenotypes:
-        find_interesting(drug, phenotype)
+for DRUG in DRUGS:
+    for PHENOTYPE in PHENOTYPES:
+        find_interesting(DRUG, PHENOTYPE)
