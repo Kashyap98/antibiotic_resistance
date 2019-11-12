@@ -43,9 +43,9 @@ def get_trees(drug, phenotype):
                 Phylo.write(upgmatree, temp_tree, 'newick')
 
 
-phenotypes = ["res"]
-drugs = ["CIPRO"]
+PHENOTYPES = ["res"]
+DRUGS = ["CIPRO"]
 
-for drug in drugs:
-    for phenotype in phenotypes:
-        get_trees(drug, phenotype)
+for DRUG in DRUGS:
+    for PHENOTYPE in PHENOTYPES:
+        get_trees(DRUG, PHENOTYPE)

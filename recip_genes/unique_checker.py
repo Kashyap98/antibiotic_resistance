@@ -85,7 +85,7 @@ def get_uniques(drug, phenotype):
         unique_df = unique_df.append(series, ignore_index=True)
         temp_count += 1
 
-    unique_df.to_csv(os.path.join(drug_dirs.drug_dir + "_UniqueMatches.csv"), index=False)
+    unique_df.to_csv(os.path.join(drug_dirs.drug_dir + f"{phenotype}_UniqueMatches.csv"), index=False)
 
 
 PHENOTYPES = ["sus", "res"]

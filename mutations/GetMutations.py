@@ -6,6 +6,7 @@ from models.Gene import Gene
 from models.Mutation import Mutation
 
 
+# TODO Still needs refactoring, will probably not use anymore
 # get all the mutations for the set of genes
 def get_mutations(drug, phenotype):
 
