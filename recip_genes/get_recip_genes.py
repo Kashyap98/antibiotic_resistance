@@ -17,10 +17,10 @@ def get_recips(drug, phenotype):
 
     # Get all the organisms for the phenotype
     gene_count = []
-    organism = csv.reader(drug_dirs.target_phenotype_file, delimiter=',')
+    all_organisms_raw = list(csv.reader(open(drug_dirs.target_phenotype_file), delimiter=','))
     all_organisms = []
-    for row in organism:
-        all_organisms.append(row[0])
+    for org in all_organisms_raw:
+        all_organisms.append(org[0])
     target_org = str(all_organisms.pop(0))
     match_count = len(all_organisms)
     final_gene_counter = {}
@@ -33,32 +33,29 @@ def get_recips(drug, phenotype):
     all_genes = os.listdir(all_genes_path)
     print("All Organisms: ", all_organisms)
     print("Number of all Genes: ", len(all_genes))
-    print("Originial Organism: ", target_org)
+    print("Original Organism: ", target_org)
     genes_removed = {}
-    count = 0
+    count = 1
     for organism in all_organisms:
         # For each other genome we want to compare to, Recip BLAST those genes and only keep the ones are the same
         organism_name = str(organism)
         print(organism_name)
-        print(str(count) + "/" + str(len(all_organisms)))
+        print(str(count) + "/" + str(len(all_organisms) + 1))
         recip_organism_dirs = OrganismDirs(organism_name)
         database_path = recip_organism_dirs.database_dir
 
         for gene in all_genes:
             # First blast the first organism gene against the database of the gene in the list.
-
             current_gene = Gene(target_org, gene)
             blast_data = b.blast(current_gene, database_path, organism_name)
 
             if not blast_data:
                 # all_genes.remove(gene)
-                print(gene)
                 genes_removed[gene] = "There was no match!"
                 continue
 
             if not blast_data.blast_in_threshold:
                 # all_genes.remove(gene)
-                print(gene)
                 genes_removed[gene] = "Match bitscore was < 1000 or Lengths did not match!"
                 continue
 
@@ -66,17 +63,15 @@ def get_recips(drug, phenotype):
 
             if not recip_blast:
                 # all_genes.remove(gene)
-                print(gene)
                 genes_removed[gene] = "Recip Blast did not match"
                 continue
 
             if not recip_blast.blast_in_threshold:
                 # all_genes.remove(gene)
-                print(gene)
                 genes_removed[gene] = "Recip Blast bitscore was < 1000!"
                 continue
 
-            if blast_data.target_gene.name == blast_data.blast_gene.name:
+            if current_gene.name == recip_blast.gene_name:
                 output_file.write_recip_info(target_org, gene, blast_data.bitscore, blast_data.match_ratio,
                                              blast_data.gene_name, organism)
                 if gene in final_gene_counter:
@@ -86,7 +81,6 @@ def get_recips(drug, phenotype):
             else:
                 # all_genes.remove(gene)
                 genes_removed[gene] = "Recip Blast was not the same name!"
-                print(gene)
                 continue
 
         print("Organism: " + organism_name)
@@ -98,16 +92,23 @@ def get_recips(drug, phenotype):
     for key, value in final_gene_counter.items():
         if value == match_count:
             final_genes.append(key)
-    total = pd.DataFrame(final_genes)
-    total.to_csv(os.path.join(os.getcwd(), "sorted_data", drug, phenotype + "_RecipGenes.csv"), index=False)
-    gene_count_df = pd.DataFrame(gene_count)
-    gene_count_df.to_csv(os.path.join(os.getcwd(), "sorted_data", drug, phenotype + "_GeneCount.csv"), index=False)
-    removed_genes_df = pd.DataFrame(genes_removed, index=[0])
-    removed_genes_df.to_csv(os.path.join(os.getcwd(), "sorted_data", drug, f"{phenotype}_GenesNotMatched.csv"))
+    # total = pd.DataFrame(final_genes)
+    # total.to_csv(os.path.join(drug_dirs.drug_dir, f"{phenotype}_RecipGenes.csv"), index=False)
+    with open(os.path.join(drug_dirs.drug_dir, f"{phenotype}_RecipGenes.csv"), "w") as total_recip_genes:
+        for f_gene in final_genes:
+            total_recip_genes.write(f"{f_gene}\n")
+
+    with open(os.path.join(drug_dirs.drug_dir, f"{phenotype}_GeneCount.csv"), "w") as gene_count_file:
+        for g_count in gene_count:
+            gene_count_file.write(f"{g_count}\n")
+
+    with open(os.path.join(drug_dirs.drug_dir, f"{phenotype}_GenesNotMatched.csv"), "w") as not_matched:
+        for key, value in genes_removed.items():
+            not_matched.write(f"{key},{value}\n")
 
 
 PHENOTYPES = ["res"]
-DRUGS = ["CIPRO"]
+DRUGS = ["AMOXO"]
 
 for DRUG in DRUGS:
     for PHENOTYPE in PHENOTYPES:

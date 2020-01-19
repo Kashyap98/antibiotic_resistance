@@ -20,14 +20,21 @@ def generate_dir(in_dir):
         print("Folder already made!")
 
 
+def cp_umb_dir_fixer(cp):
+    if str(cp).isnumeric():
+        return f"CP-{cp}"
+    else:
+        return cp
+
+
 class OrganismDirs:
 
     def __init__(self, organism):
         self.organism = organism
-        self.organism_folder = os.path.join(CONVERTED_DATA_DIR, organism)
+        self.organism_folder = os.path.join(CONVERTED_DATA_DIR, cp_umb_dir_fixer(organism))
         self.gene_folder = os.path.join(self.organism_folder, "genes")
         self.gene_info_folder = os.path.join(self.organism_folder, "gene_info")
-        self.database_dir = os.path.join(self.organism_folder, organism)
+        self.database_dir = os.path.join(self.organism_folder, cp_umb_dir_fixer(organism))
 
 
 class DrugDirs:
@@ -42,6 +49,8 @@ class DrugDirs:
         self.variations_dir = os.path.join(self.drug_dir, "variations")
         self.trees_dir = os.path.join(self.variations_dir, "trees")
         self.alignments_dir = os.path.join(self.variations_dir, "alignments")
+        self.res_recip_genes_file = os.path.join(self.drug_dir, f"{phenotype}_RecipGenes.csv")
+        self.unique_genes_file = os.path.join(self.drug_dir, f"{phenotype}_UniqueGenes.csv")
 
     def set_opposite_phenotype_file(self, op_phenotype):
         self.op_phenotype_file = os.path.join(self.drug_dir, f"{op_phenotype}.csv")

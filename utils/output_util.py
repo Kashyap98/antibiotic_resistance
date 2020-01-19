@@ -21,7 +21,7 @@ class DataOutput:
         # write to the file based on the type of data being inputted
         with open(self.output_file, "a+") as output_file:
             if is_start:
-                output_file.write(data + ",")
+                output_file.write(str(data) + ",")
             else:
                 output_file.write(str(data) + ",")
             if is_end:

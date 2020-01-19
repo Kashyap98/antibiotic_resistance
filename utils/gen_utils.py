@@ -8,6 +8,8 @@ from models.Gene import Gene
 import pandas as pd
 
 
+
+
 def get_op_phenotype(phenotype):
     op_phenotype = "res"
     if phenotype == "res":

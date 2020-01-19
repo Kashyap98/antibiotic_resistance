@@ -21,18 +21,18 @@ def get_uniques(drug, phenotype):
     drug_dirs.set_opposite_phenotype_file(op_phenotype)
 
     # Main Organism
-    organism_file = pd.read_csv(drug_dirs.target_phenotype_file)
+    organism_file = pd.read_csv(drug_dirs.target_phenotype_file, header=None)
     all_orgs = list(organism_file.iloc[:, 0])
     target_organism_dirs = OrganismDirs(all_orgs[0])
 
     # Get file with all the Genes
-    gene_file = pd.read_csv(os.path.join(os.getcwd(), "sorted_data", drug, phenotype + "_RecipGenes.csv"))
+    gene_file = pd.read_csv(drug_dirs.res_recip_genes_file, header=None)
     all_genes = list(gene_file.iloc[:, 0])
 
     print("Number of all Genes: ", len(all_genes))
 
     unique_matched = {}
-    op_organism_file = pd.read_csv(drug_dirs.op_phenotype_file)
+    op_organism_file = pd.read_csv(drug_dirs.op_phenotype_file, header=None)
     op_orgs = list(op_organism_file.iloc[:, 0])
     count = 0
     for op_organism in op_orgs:
@@ -44,7 +44,7 @@ def get_uniques(drug, phenotype):
         for gene in all_genes:
             # First blast the first organism gene against the database of the gene in the list.
             target_gene = Gene(target_organism_dirs.organism, gene, get_info=True)
-            blast_data = b.blast(target_gene.fasta_file, op_organism_dirs.database_dir, op_organism)
+            blast_data = b.blast(target_gene, op_organism_dirs.database_dir, op_organism)
             # print(blast_data)
             matched_organisms = []
             matched_genes = []
@@ -77,19 +77,18 @@ def get_uniques(drug, phenotype):
         count += 1
 
     # output the results as a csv, for some reason I started doing it this way for a while
-    unique_df = pd.DataFrame()
-    temp_count = 0
-    for key in unique_matched.keys():
-        row = unique_matched[key]
-        series = pd.Series([key, row[0], row[1], row[2], row[3]])
-        unique_df = unique_df.append(series, ignore_index=True)
-        temp_count += 1
+    with open(os.path.join(drug_dirs.drug_dir, f"{phenotype}_UniqueMatches.csv"), "w") as unique_matches:
+        for key in unique_matched.keys():
+            row = unique_matched[key]
+            unique_matches.write(f"{key},{row[0]},{row[1]},{row[2]},{row[3]}\n")
 
-    unique_df.to_csv(os.path.join(drug_dirs.drug_dir + f"{phenotype}_UniqueMatches.csv"), index=False)
+    with open(drug_dirs.unique_genes_file, "w") as unique_genes:
+        for gene in all_genes:
+            unique_genes.write(f"{gene}\n")
 
 
-PHENOTYPES = ["sus", "res"]
-DRUGS = ["CIPRO"]
+PHENOTYPES = ["res"]
+DRUGS = ["AMOXO"]
 
 for DRUG in DRUGS:
     for PHENOTYPE in PHENOTYPES:
