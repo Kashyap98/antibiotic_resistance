@@ -27,7 +27,6 @@ for file in glob.glob(os.path.join(dir_utils.ANNOTATION_DIR, '*.txt')):
     # for each gene row, make fasta for gene file.
     gene = 1
     while gene < (len(df)):
-
         # Parse out information for each gene.
         geneData = df.iloc[gene]
         contig_id = str(geneData[0]).replace(",", "_").replace(".", "_").replace("|", "_")
@@ -45,16 +44,19 @@ for file in glob.glob(os.path.join(dir_utils.ANNOTATION_DIR, '*.txt')):
         aa_sequence = str(geneData[12])
 
         # Uncomment to create fasta files at the same time.
-        with open(os.path.join(organismGeneFolder, feature_id + ".fasta"), "w") as fastaFile:
-            fastaFile.write(">" + feature_id + "\n" + nucleotide_sequence + "\n")
+        # with open(os.path.join(organismGeneFolder, feature_id + ".fasta"), "w") as fastaFile:
+        #     fastaFile.write(">" + feature_id + "\n" + nucleotide_sequence + "\n")
 
-        # for each gene row, make text document with info.
-        with open(os.path.join(organismGeneInfoFolder, feature_id + ".txt"), "w") as infoFile:
-            infoFile.write(
-                "contig_id, " + contig_id + "\n" + "feature_id, " + feature_id + "\n" + "type_data, " +
-                type_data + "\n" + "location, " + location + "\n" + "start, " + start + "\n" + "stop, " + stop + "\n" +
-                "strand, " + strand + "\n" + "function_data, " + function_data + "\n" + "aliases, " + aliases + "\n" +
-                "figfam, " + figfam + "\n" + "evidence_codes, " + evidence_codes + "\n"
-                + "nucleotide_sequence, " + nucleotide_sequence + "\n" + "aa_sequence, " + aa_sequence)
+        with open(os.path.join(organismGeneFolder, feature_id + "-protein.fasta"), "w") as fastaFile:
+            fastaFile.write(">" + feature_id + "\n" + aa_sequence + "\n")
+
+        # # for each gene row, make text document with info.
+        # with open(os.path.join(organismGeneInfoFolder, feature_id + ".txt"), "w") as infoFile:
+        #     infoFile.write(
+        #         "contig_id, " + contig_id + "\n" + "feature_id, " + feature_id + "\n" + "type_data, " +
+        #         type_data + "\n" + "location, " + location + "\n" + "start, " + start + "\n" + "stop, " + stop + "\n" +
+        #         "strand, " + strand + "\n" + "function_data, " + function_data + "\n" + "aliases, " + aliases + "\n" +
+        #         "figfam, " + figfam + "\n" + "evidence_codes, " + evidence_codes + "\n"
+        #         + "nucleotide_sequence, " + nucleotide_sequence + "\n" + "aa_sequence, " + aa_sequence)
         print(f"{gene}")
         gene += 1

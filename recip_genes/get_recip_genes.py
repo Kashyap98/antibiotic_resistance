@@ -1,4 +1,5 @@
 import csv
+import glob
 import os
 
 import pandas as pd
@@ -31,22 +32,24 @@ def get_recips(drug, phenotype):
 
     # get all the genes for the target organism
     all_genes = os.listdir(all_genes_path)
+
     print("All Organisms: ", all_organisms)
     print("Number of all Genes: ", len(all_genes))
     print("Original Organism: ", target_org)
     genes_removed = {}
     count = 1
+    final_gene_info = {}
     for organism in all_organisms:
         # For each other genome we want to compare to, Recip BLAST those genes and only keep the ones are the same
         organism_name = str(organism)
         print(organism_name)
-        print(str(count) + "/" + str(len(all_organisms) + 1))
+        print(str(count) + "/" + str(len(all_organisms)))
         recip_organism_dirs = OrganismDirs(organism_name)
         database_path = recip_organism_dirs.database_dir
 
         for gene in all_genes:
             # First blast the first organism gene against the database of the gene in the list.
-            current_gene = Gene(target_org, gene)
+            current_gene = Gene(target_org, gene, get_info=True)
             blast_data = b.blast(current_gene, database_path, organism_name)
 
             if not blast_data:
@@ -71,9 +74,29 @@ def get_recips(drug, phenotype):
                 genes_removed[gene] = "Recip Blast bitscore was < 1000!"
                 continue
 
+            if gene in final_gene_info:
+                old_data = final_gene_info[gene]
+                gene_function = old_data[0]
+                new_count = old_data[1] + 1
+                new_qcov = (old_data[2] + blast_data.qcov) / 2
+                new_pident = (old_data[3] + blast_data.pident) / 2
+                if int(blast_data.qcov) == 100 and int(blast_data.pident) == 100:
+                    new_perfect_matches = old_data[4] + 1
+                else:
+                    new_perfect_matches = old_data[4]
+                final_gene_info[gene] = [gene_function, new_count, new_qcov, new_pident, new_perfect_matches]
+            else:
+                hit_count = 1
+                if int(blast_data.qcov) == 100 and int(blast_data.pident) == 100:
+                    perfect_matches = 1
+                else:
+                    perfect_matches = 0
+                final_gene_info[gene] = [current_gene.function_data, hit_count, blast_data.qcov,
+                                         blast_data.pident, perfect_matches]
+
             if current_gene.name == recip_blast.gene_name:
-                output_file.write_recip_info(target_org, gene, blast_data.bitscore, blast_data.match_ratio,
-                                             blast_data.gene_name, organism)
+                # output_file.write_recip_info(target_org, gene, blast_data.bitscore, blast_data.match_ratio,
+                #                              blast_data.gene_name, organism)
                 if gene in final_gene_counter:
                     final_gene_counter[gene] += 1
                 else:
@@ -92,10 +115,9 @@ def get_recips(drug, phenotype):
     for key, value in final_gene_counter.items():
         if value == match_count:
             final_genes.append(key)
-    # total = pd.DataFrame(final_genes)
-    # total.to_csv(os.path.join(drug_dirs.drug_dir, f"{phenotype}_RecipGenes.csv"), index=False)
+
     with open(os.path.join(drug_dirs.drug_dir, f"{phenotype}_RecipGenes.csv"), "w") as total_recip_genes:
-        for f_gene in final_genes:
+        for f_gene in all_genes:
             total_recip_genes.write(f"{f_gene}\n")
 
     with open(os.path.join(drug_dirs.drug_dir, f"{phenotype}_GeneCount.csv"), "w") as gene_count_file:
@@ -106,9 +128,18 @@ def get_recips(drug, phenotype):
         for key, value in genes_removed.items():
             not_matched.write(f"{key},{value}\n")
 
+    # final_gene_info[gene] = [gene_function, new_count, new_qcov, new_pident, new_perfect_matches]
+    with open(os.path.join(drug_dirs.drug_dir, f"{phenotype}_recip_detailed_info.csv"), "w") as recip_detailed:
+        recip_detailed.write("gene,gene_function,hit_count,qcov_average,pident_average,perfect_matches\n")
+        for gene in all_genes:
+            if gene in final_gene_info:
+                data = list(final_gene_info[gene])
+                if data[1] == match_count:
+                    recip_detailed.write(f"{gene},{str(data[0])},{str(data[1])},{str(data[2])},{str(data[3])},{str(data[4])}\n")
+
 
 PHENOTYPES = ["res"]
-DRUGS = ["AMOXO"]
+DRUGS = ["CIPRO"]
 
 for DRUG in DRUGS:
     for PHENOTYPE in PHENOTYPES:

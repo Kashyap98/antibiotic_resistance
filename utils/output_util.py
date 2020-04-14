@@ -27,7 +27,7 @@ class DataOutput:
             if is_end:
                 output_file.write("\n")
 
-    def write_unique_info(self, target_gene, recip_gene, bitscore, match_ratio):
+    def write_unique_info(self, target_gene, recip_gene, bitscore, match_ratio, qcov):
         # write each cell of the csv
         self.write_cell(target_gene.organism, is_start=True)
         self.write_cell(target_gene.name)
@@ -35,6 +35,7 @@ class DataOutput:
         self.write_cell(recip_gene.name)
         self.write_cell(bitscore)
         self.write_cell(match_ratio)
+        self.write_cell(qcov)
         self.write_cell("Remember to fix")
         self.write_cell(recip_gene.type_data)
         self.write_cell(recip_gene.location)
