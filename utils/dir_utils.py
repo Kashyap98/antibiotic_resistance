@@ -1,9 +1,13 @@
 import os
 
+from utils import dir_utils
+
 MAIN_DIR = os.path.join(os.getcwd(), "..")
 ANNOTATION_DIR = os.path.join(MAIN_DIR, "annotations")
 CONVERTED_DATA_DIR = os.path.join(MAIN_DIR, "converted_data")
 SORTED_DATA_DIR = os.path.join(MAIN_DIR, "sorted_data")
+NCBI_DATA_DIR = os.path.join(MAIN_DIR, "ncbi_data")
+CONVERTED_NCBI_DATA_DIR = os.path.join(NCBI_DATA_DIR, "converted_ncbi_data")
 
 # Drug constants
 FOSF_DIR = os.path.join(SORTED_DATA_DIR, "FOSF")
@@ -11,6 +15,8 @@ CIPRO_DIR = os.path.join(SORTED_DATA_DIR, "CIPRO")
 AMOXO_DIR = os.path.join(SORTED_DATA_DIR, "AMOXO")
 SULF_DIR = os.path.join(SORTED_DATA_DIR, "SULF")
 CEPRO_DIR = os.path.join(SORTED_DATA_DIR, "CEPRO")
+
+ORGANISM_LABELS_FILE = os.path.join(MAIN_DIR, "organism_labels.csv")
 
 
 def generate_dir(in_dir):
@@ -29,9 +35,12 @@ def cp_umb_dir_fixer(cp):
 
 class OrganismDirs:
 
-    def __init__(self, organism):
+    def __init__(self, organism, converted_ncbi_data=False):
         self.organism = organism
-        self.organism_folder = os.path.join(CONVERTED_DATA_DIR, cp_umb_dir_fixer(organism))
+        if converted_ncbi_data:
+            self.organism_folder = os.path.join(dir_utils.CONVERTED_NCBI_DATA_DIR, cp_umb_dir_fixer(organism))
+        else:
+            self.organism_folder = os.path.join(CONVERTED_DATA_DIR, cp_umb_dir_fixer(organism))
         self.gene_folder = os.path.join(self.organism_folder, "genes")
         self.gene_info_folder = os.path.join(self.organism_folder, "gene_info")
         self.database_dir = os.path.join(self.organism_folder, cp_umb_dir_fixer(organism))

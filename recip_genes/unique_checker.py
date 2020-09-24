@@ -122,7 +122,6 @@ def get_uniques(drug, phenotype):
 
 PHENOTYPES = ["res"]
 DRUGS = ["AMOXO"]
-# DRUGS = ["CEPRO", "CIPRO", "SULF"]
 
 for DRUG in DRUGS:
     for PHENOTYPE in PHENOTYPES:

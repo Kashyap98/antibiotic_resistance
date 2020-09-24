@@ -22,7 +22,7 @@ class BlastResult:
         self.qcov = int(bitscore_fixer(blast_data, blast_data[3]))
         self.pident = float(bitscore_fixer(blast_data, blast_data[4]))
         self.target_gene = target_gene
-        self.blast_gene = Gene(blast_organism, self.gene_name, get_info=True)
+        self.blast_gene = Gene(blast_organism, self.gene_name)
         self.blast_in_threshold = self.threshold_check()
         self.qcov_above_threshold = self.qcov_check()
         self.match_ratio = float(round(int(self.match_length) / int(self.target_gene.length), 2))
