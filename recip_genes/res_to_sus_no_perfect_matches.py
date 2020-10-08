@@ -22,7 +22,7 @@ def get_uniques(drug, phenotype):
     # Main Organism
     organism_file = pd.read_csv(drug_dirs.target_phenotype_file, header=None)
     all_orgs = list(organism_file.iloc[:, 0])
-    target_organism_dirs = OrganismDirs(all_orgs[0])
+    target_organism_dirs = OrganismDirs(all_orgs[0], converted_ncbi_data=True)
     op_organism_file = pd.read_csv(drug_dirs.op_phenotype_file, header=None)
     op_orgs = list(op_organism_file.iloc[:, 0])
 
@@ -50,10 +50,10 @@ def get_uniques(drug, phenotype):
             # For each other genome we want to compare to, Recip BLAST those genes and only keep the ones are the same
             op_organism = str(op_organism)
             # print(f"{str(count)} / {str(len(op_orgs))}")
-            op_organism_dirs = OrganismDirs(op_organism)
+            op_organism_dirs = OrganismDirs(op_organism, converted_ncbi_data=True)
 
             # First blast the first organism gene against the database of the gene in the list.
-            res_gene = Gene(target_organism_dirs.organism, current_gene, get_info=True)
+            res_gene = Gene(target_organism_dirs.organism, current_gene, get_info=False)
             blast_data = b.blast(res_gene, op_organism_dirs.database_dir, op_organism)
 
             # if there is a hit
@@ -79,7 +79,7 @@ def get_uniques(drug, phenotype):
                 else:
                     perfect_matches = 0
                 qcov_genes[current_gene] = [hit_count, blast_data.qcov, blast_data.pident, perfect_matches,
-                                            blast_data.blast_gene.length, blast_data.blast_gene.function_data]
+                                            blast_data.blast_gene.length, blast_data.blast_gene.description]
 
         print(f"{i} / {res_genes_length}")
 
@@ -90,13 +90,12 @@ def get_uniques(drug, phenotype):
     with open(os.path.join(drug_dirs.drug_dir, f"{phenotype}_aa_sus_no_perfect_matches.csv"), "w") as qcov_gene_files:
         qcov_gene_files.write("gene,hit_count,qcov_average,pident_average,perfect_matches,gene_length,function\n")
         for gene, info in qcov_genes.items():
-            if info[3] == 0:
-                qcov_gene_files.write(f"{gene},{str(info[0])},{str(info[1])},{str(info[2])},{str(info[3])},"
-                                      f"{str(info[4])},{str(info[5])}\n")
+            qcov_gene_files.write(f"{gene},{str(info[0])},{str(info[1])},{str(info[2])},{str(info[3])},"
+                                  f"{str(info[4])},{str(info[5])}\n")
 
 
 PHENOTYPES = ["res"]
-DRUGS = ["AMOXO"]
+DRUGS = ["CIPRO"]
 
 for DRUG in DRUGS:
     for PHENOTYPE in PHENOTYPES:

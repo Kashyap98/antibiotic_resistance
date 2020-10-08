@@ -131,8 +131,8 @@ def get_recips(drug, phenotype):
         t.join()
 
 
-PHENOTYPES = ["sus"]
-DRUGS = ["AMOXO"]
+PHENOTYPES = ["res"]
+DRUGS = ["CIPRO"]
 
 for DRUG in DRUGS:
     for PHENOTYPE in PHENOTYPES:
