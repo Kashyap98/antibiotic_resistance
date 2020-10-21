@@ -132,7 +132,7 @@ def get_recips(drug, phenotype):
 
 
 PHENOTYPES = ["res"]
-DRUGS = ["CIPRO"]
+DRUGS = ["AMOXO"]
 
 for DRUG in DRUGS:
     for PHENOTYPE in PHENOTYPES:
