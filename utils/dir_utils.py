@@ -1,6 +1,6 @@
 import os
 
-from utils import dir_utils
+from utils import gen_utils
 
 MAIN_DIR = os.path.join(os.getcwd(), "..")
 ANNOTATION_DIR = os.path.join(MAIN_DIR, "annotations")
@@ -23,8 +23,8 @@ DATA_SOURCE_FILE = os.path.join(MAIN_DIR, "antibiotic_resistance_csv.csv")
 def generate_dir(in_dir):
     try:
         os.makedirs(in_dir)
-    except:
-        print("Folder already made!")
+    except FileExistsError:
+        print(f"Folder already made! - {in_dir}")
 
 
 def cp_umb_dir_fixer(cp):
@@ -39,9 +39,10 @@ class OrganismDirs:
     def __init__(self, organism, converted_ncbi_data=False):
         self.organism = organism
         if converted_ncbi_data:
-            self.organism_folder = os.path.join(dir_utils.CONVERTED_NCBI_DATA_DIR, cp_umb_dir_fixer(organism))
+            self.organism_folder = os.path.join(CONVERTED_NCBI_DATA_DIR, cp_umb_dir_fixer(organism))
         else:
             self.organism_folder = os.path.join(CONVERTED_DATA_DIR, cp_umb_dir_fixer(organism))
+
         self.gene_folder = os.path.join(self.organism_folder, "genes")
         self.gene_info_folder = os.path.join(self.organism_folder, "gene_info")
         self.database_dir = os.path.join(self.organism_folder, cp_umb_dir_fixer(organism))
@@ -54,13 +55,12 @@ class DrugDirs:
         self.res_file = os.path.join(self.drug_dir, "res.csv")
         self.sus_file = os.path.join(self.drug_dir, "sus.csv")
         self.ind_file = os.path.join(self.drug_dir, "ind.csv")
-        self.target_phenotype_file = os.path.join(self.drug_dir, f"{phenotype}.csv")
-        self.op_phenotype_file = os.path.join(self.drug_dir, f"{phenotype}.csv")
-        self.variations_dir = os.path.join(self.drug_dir, "variations")
-        self.trees_dir = os.path.join(self.variations_dir, "trees")
-        self.alignments_dir = os.path.join(self.variations_dir, "alignments")
-        self.res_recip_genes_file = os.path.join(self.drug_dir, f"{phenotype}_RecipGenes.csv")
-        self.unique_genes_file = os.path.join(self.drug_dir, f"{phenotype}_UniqueGenes.csv")
 
-    def set_opposite_phenotype_file(self, op_phenotype):
-        self.op_phenotype_file = os.path.join(self.drug_dir, f"{op_phenotype}.csv")
+        self.target_phenotype = phenotype
+        self.opposite_phenotype = gen_utils.get_op_phenotype(phenotype)
+
+        self.target_phenotype_file = os.path.join(self.drug_dir, f"{self.target_phenotype}.csv")
+        self.op_phenotype_file = os.path.join(self.drug_dir, f"{self.opposite_phenotype}.csv")
+
+        self.res_recip_genes_file = os.path.join(self.drug_dir, f"res_recip_genes.csv")
+        self.res_unique_genes_file = os.path.join(self.drug_dir, f"res_unique_genes.csv")
