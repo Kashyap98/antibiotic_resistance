@@ -7,8 +7,8 @@ from queue import Queue
 
 import pandas as pd
 
-from models import Blast as b
-from models.Gene import Gene
+from models import blast as b
+from models.gene import Gene
 from utils import gen_utils, dir_utils
 from utils.output_util import DataOutput
 from utils.dir_utils import OrganismDirs, DrugDirs

@@ -2,10 +2,9 @@ import os
 
 import pandas as pd
 
-from models import Blast as b
-from models.BlastResult import BlastResult
-from models.Gene import Gene
-from utils import dir_utils, gen_utils, output_util
+from models import blast as b
+from models.gene import Gene
+from utils import dir_utils, gen_utils
 
 
 def findstem(arr):

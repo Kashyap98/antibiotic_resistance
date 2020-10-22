@@ -2,8 +2,8 @@ import os
 
 import pandas as pd
 
-from models import Blast as b
-from models.Gene import Gene
+from models import blast as b
+from models.gene import Gene
 from utils import dir_utils
 from utils.dir_utils import OrganismDirs, DrugDirs
 import utils.gen_utils as gen_utils

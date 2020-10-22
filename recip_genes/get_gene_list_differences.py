@@ -2,7 +2,7 @@ import os
 
 import pandas as pd
 
-from models.Gene import Gene
+from models.gene import Gene
 from utils.dir_utils import OrganismDirs, DrugDirs
 
 

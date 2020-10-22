@@ -4,7 +4,7 @@ from Bio.Alphabet import IUPAC
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 import os
-from models.Gene import Gene
+from models.gene import Gene
 import pandas as pd
 
 

@@ -1,13 +1,5 @@
-from models.Gene import Gene
+from models.gene import Gene
 
-
-def bitscore_fixer(result, bitscore):
-    if len(result) > 3:
-        bitscore = bitscore.split("\n")[0]
-    else:
-        bitscore = bitscore.strip("\n")
-
-    return bitscore
 
 
 # organize the blast result in an easily accessible class
