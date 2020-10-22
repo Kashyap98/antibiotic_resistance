@@ -17,6 +17,7 @@ SULF_DIR = os.path.join(SORTED_DATA_DIR, "SULF")
 CEPRO_DIR = os.path.join(SORTED_DATA_DIR, "CEPRO")
 
 ORGANISM_LABELS_FILE = os.path.join(MAIN_DIR, "organism_labels.csv")
+DATA_SOURCE_FILE = os.path.join(MAIN_DIR, "antibiotic_resistance_csv.csv")
 
 
 def generate_dir(in_dir):
