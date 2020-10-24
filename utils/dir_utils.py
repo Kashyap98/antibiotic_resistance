@@ -64,3 +64,6 @@ class DrugDirs:
 
         self.res_recip_genes_file = os.path.join(self.drug_dir, f"res_recip_genes.csv")
         self.res_unique_genes_file = os.path.join(self.drug_dir, f"res_unique_genes.csv")
+
+        self.res_recip_to_all_sus = os.path.join(self.drug_dir, f"res_recip_to_all_sus.csv")
+

@@ -9,8 +9,7 @@ import pandas as pd
 
 from models import blast as b
 from models.gene import Gene
-from utils import gen_utils
-from utils.output_util import DataOutput
+from utils import gen_utils, output_util
 from utils.dir_utils import OrganismDirs, DrugDirs
 
 
@@ -30,30 +29,21 @@ class MyThread(threading.Thread):
 
     def run(self):
         while True:
-            gene = self.queue.get()
-            if gene is None:  # If you send `None`, the thread will exit.
+            gene_list = self.queue.get()
+            if gene_list is None:  # If you send `None`, the thread will exit.
                 self.output_queue.put(self.final_gene_info)
                 return
-            self.do_work(gene)
+            self.do_work(gene_list)
 
-    def do_work(self, gene):
+    def do_work(self, gene_list):
 
-        organism_name = str(self.target_organism)
-        recip_organism_dirs = OrganismDirs(organism_name, converted_ncbi_data=True)
-        database_path = recip_organism_dirs.database_dir
+        cleaned_gene_list = gene_list.replace("[", "").replace("]", "").replace("'", "").replace(" ", "")
+        final_gene_list = cleaned_gene_list.split("+")
 
-        # First blast the first organism gene against the database of the gene in the list.
-        target_gene = Gene(self.target_organism, gene)
+        for gene_info in final_gene_list:
 
-        for res_organism in self.organisms:
-            res_organism_dirs = OrganismDirs(res_organism, converted_ncbi_data=True)
-            res_database_path = res_organism_dirs.database_dir
-
-            res_blast_data = b.blast(target_gene, res_database_path, res_organism)
-            current_gene = res_blast_data.blast_gene
-
-            if not res_blast_data:
-                continue
+            res_organism, res_gene_name = gene_info.split("~")
+            current_gene = Gene(res_organism, res_gene_name, get_info=False)
 
             for op_org in self.op_orgs:
 
@@ -65,8 +55,8 @@ class MyThread(threading.Thread):
                 if not blast_data:
                     continue
 
-                if gene in self.final_gene_info:
-                    old_data = self.final_gene_info[gene]
+                if gene_info in self.final_gene_info:
+                    old_data = self.final_gene_info[gene_info]
                     gene_description = old_data[0]
                     new_qcov = (old_data[1] + blast_data.qcov) / 2
                     new_pident = (old_data[2] + blast_data.pident) / 2
@@ -84,7 +74,7 @@ class MyThread(threading.Thread):
                         new_match_organisms = old_data[5]
                         new_match_organisms.append(op_org)
 
-                    self.final_gene_info[gene] = [gene_description, new_qcov, new_pident, new_count,
+                    self.final_gene_info[gene_info] = [gene_description, new_qcov, new_pident, new_count,
                                                   new_perfect_matches,
                                                   new_match_organisms, new_perfect_match_organisms]
                 else:
@@ -100,7 +90,7 @@ class MyThread(threading.Thread):
                         res_perfect_match_organisms = []
                         res_match_organisms = [op_org]
 
-                    self.final_gene_info[gene] = [current_gene.description, blast_data.qcov,
+                    self.final_gene_info[gene_info] = [current_gene.description, blast_data.qcov,
                                                   blast_data.pident, hit_count, perfect_matches, res_match_organisms,
                                                   res_perfect_match_organisms]
 
@@ -111,27 +101,23 @@ class MyThread(threading.Thread):
 def get_recips(drug, phenotype):
     # Create output file
     drug_dirs = DrugDirs(drug, phenotype)
-    with open(os.path.join(drug_dirs.drug_dir, f"{phenotype}_aa_sus_detailed_info_ALL_TEST.csv"), "w") as recip_detailed:
-        recip_detailed.write("gene,gene_description,qcov_average,pident_average,hit_count,perfect_match_count,hit_orgs,perfect_match_orgs\n")
-    # Get all the organisms for the phenotype
-    all_organisms_raw = list(csv.reader(open(drug_dirs.target_phenotype_file), delimiter=','))
-    all_organisms = []
-    for org in all_organisms_raw:
-        all_organisms.append(org[0])
-    target_org = str(all_organisms.pop(0))
+    output_file = output_util.OutputFile(drug_dirs.res_recip_to_all_sus, header_list=["gene", "gene_description",
+                                                                                      "qcov_average", "pident_average",
+                                                                                      "hit_count",
+                                                                                      "perfect_match_count",
+                                                                                      "hit_orgs", "perfect_match_orgs"])
 
-    op_phenotype = gen_utils.get_op_phenotype(phenotype)
-    drug_dirs.set_opposite_phenotype_file(op_phenotype)
-    op_organism_file = pd.read_csv(drug_dirs.op_phenotype_file, header=None)
-    op_orgs = list(op_organism_file.iloc[:, 0])
+    res_organisms = gen_utils.get_organisms_by_phenotype(drug_dirs.res_file)
+    sus_organisms = gen_utils.get_organisms_by_phenotype(drug_dirs.sus_file)
+    target_org = str(res_organisms.pop(0))
 
-    all_genes_df = pd.read_csv(os.path.join(drug_dirs.drug_dir, f"{phenotype}_aa_recip_detailed_info.csv"), header=0)
-    filtered_df = all_genes_df[all_genes_df["hit_count"] == 11]
+    all_genes_df = pd.read_csv(drug_dirs.res_recip_genes_file, header=0)
+    filtered_df = all_genes_df[all_genes_df["hit_count"] == len(res_organisms)]
 
     # get all the genes for the target organism
-    all_genes = list(filtered_df["gene"])
+    all_genes = list(filtered_df["recip_genes"])
 
-    print("All Organisms: ", op_orgs)
+    print("All Organisms: ", sus_organisms)
     print("Number of all Genes: ", len(all_genes))
     print("Original Organism: ", target_org)
 
@@ -139,7 +125,7 @@ def get_recips(drug, phenotype):
     for t in range(10):
         q = Queue()
         output_queue = Queue()
-        threads.append(MyThread(q, output_queue, target_org, all_organisms, op_orgs))
+        threads.append(MyThread(q, output_queue, target_org, res_organisms, sus_organisms))
         threads[t].start()
         time.sleep(0.1)
 
@@ -161,11 +147,7 @@ def get_recips(drug, phenotype):
     for t in threads:
         while not t.output_queue.empty():
             thread_data = t.output_queue.get()
-            with open(os.path.join(drug_dirs.drug_dir, f"{phenotype}_aa_sus_detailed_info_ALL_TEST.csv"), "a") as recip_detailed:
-                for gene, data in thread_data.items():
-                    recip_detailed.write(f"{gene},{str(data[0])},{str(data[1])},{str(data[2])},{str(data[3])},"
-                                         f"{str(data[4])},{str(data[5]).replace(',', '.')},"
-                                         f"{str(data[6]).replace(',', '.')}\n")
+            output_file.write_data_dict_to_output_file(thread_data)
 
         t.queue.put(None)
         t.join()

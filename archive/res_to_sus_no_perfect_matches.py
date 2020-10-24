@@ -17,7 +17,6 @@ def get_uniques(drug, phenotype):
                             "aliases, figfam, evidence_codes \n")
     drug_dirs = DrugDirs(drug, phenotype)
     op_phenotype = gen_utils.get_op_phenotype(phenotype)
-    drug_dirs.set_opposite_phenotype_file(op_phenotype)
 
     # Main Organism
     organism_file = pd.read_csv(drug_dirs.target_phenotype_file, header=None)

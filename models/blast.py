@@ -20,10 +20,6 @@ class BlastResult:
         self.pident = float(bitscore_fixer(blast_data, blast_data[4]))
         self.match_ratio = float(round(int(self.match_length) / int(self.target_gene.length), 2))
 
-        self.blast_in_threshold = self.above_bitscore_threshold_check()
-        self.qcov_above_threshold = self.above_qcov_threshold_check()
-        self.within_size_threshold = self.within_size_threshold()
-
     def above_bitscore_threshold_check(self):
         if self.bitscore >= self.bitscore_threshold:
             return True

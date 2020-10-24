@@ -14,7 +14,7 @@ def get_uniques(drug, phenotype):
     drug_dirs = DrugDirs(drug, phenotype)
     gene_finder_dir = os.path.join(drug_dirs.drug_dir, "gene_finder")
     op_phenotype = gen_utils.get_op_phenotype(phenotype)
-    drug_dirs.set_opposite_phenotype_file(op_phenotype)
+
     dir_utils.generate_dir(gene_finder_dir)
 
     with open(os.path.join(gene_finder_dir, f"{phenotype}_compare_topo_iv_a.csv"), "w") as total_matched_unique_genes:

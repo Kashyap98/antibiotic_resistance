@@ -122,7 +122,6 @@ def get_recips(drug, phenotype):
     drug_dirs = DrugDirs(drug, phenotype)
     dir_utils.generate_dir(os.path.join(drug_dirs.drug_dir, "complete_comparison"))
     op_phenotype = gen_utils.get_op_phenotype(phenotype)
-    drug_dirs.set_opposite_phenotype_file(op_phenotype)
 
     # Get all the organisms for the phenotype
     all_organisms_raw = list(csv.reader(open(drug_dirs.target_phenotype_file), delimiter=','))
@@ -139,7 +138,7 @@ def get_recips(drug, phenotype):
     print(f"{op_phenotype} Organisms: ", op_orgs)
 
     threads = []
-    for t in range(6):
+    for t in range(10):
         q = Queue()
         output_queue = Queue()
         threads.append(MyThread(q, output_queue, op_orgs, drug_dirs))
@@ -151,7 +150,7 @@ def get_recips(drug, phenotype):
         threads[thread_number].queue.put(x)
 
         thread_number += 1
-        if thread_number == 6:
+        if thread_number == 10:
             thread_number = 0
 
     for t in threads:
@@ -167,7 +166,7 @@ def get_recips(drug, phenotype):
 
 
 PHENOTYPES = ["res"]
-DRUGS = ["AMOXO"]
+DRUGS = ["CIPRO"]
 
 for DRUG in DRUGS:
     for PHENOTYPE in PHENOTYPES:
