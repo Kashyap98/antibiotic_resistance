@@ -43,28 +43,50 @@ class MyThread(threading.Thread):
             blast_data = b.blast(current_gene, database_path, organism_name)
 
             if not blast_data:
+                continue
+
+            res_blast_data = b.blast(blast_data.blast_gene,
+                                     dir_utils.OrganismDirs(blast_data.blast_gene.organism,
+                                                            converted_ncbi_data=True).database_dir,
+                                     blast_data.blast_gene.organism)
+
+            if not res_blast_data:
                 break
 
             if not blast_data.above_bitscore_threshold_check():
+                with print_lock:
+                    print(threading.currentThread().getName(), f"Thrown Out size {current_gene.description}")
                 break
 
             if not blast_data.within_size_constraints_check():
+                with print_lock:
+                    print(threading.currentThread().getName(), f"Thrown Out size {current_gene.description}")
                 break
+
+            if not blast_data.above_qcov_threshold_check():
+                with print_lock:
+                    print(threading.currentThread().getName(), f"QCov {current_gene.description}")
+                break
+
+            # if blast_data.qcov > 100:
+            #     with print_lock:
+            #         print(threading.currentThread().getName(), f"QCOV > 100 {current_gene.description}")
 
             if gene in self.final_gene_info:
                 old_data = self.final_gene_info[gene]
                 gene_description = old_data[0]
                 new_count = old_data[1] + 1
-                new_qcov = (old_data[2] + blast_data.qcov) / 2
-                new_pident = (old_data[3] + blast_data.pident) / 2
-                new_genes = old_data[5]
+                new_bitscore = (old_data[2] + blast_data.bitscore) / 2
+                new_qcov = (old_data[3] + blast_data.qcov) / 2
+                new_pident = (old_data[4] + blast_data.pident) / 2
+                new_genes = old_data[6]
                 new_genes.append(f"{organism}~{blast_data.blast_gene.name}")
                 if int(blast_data.qcov) == 100 and int(blast_data.pident) == 100:
-                    new_perfect_matches = old_data[4] + 1
+                    new_perfect_matches = old_data[5] + 1
                 else:
-                    new_perfect_matches = old_data[4]
+                    new_perfect_matches = old_data[5]
 
-                self.final_gene_info[gene] = [gene_description, new_count, new_qcov, new_pident,
+                self.final_gene_info[gene] = [gene_description, new_count, new_bitscore, new_qcov, new_pident,
                                               new_perfect_matches, new_genes]
             else:
                 hit_count = 1
@@ -72,7 +94,7 @@ class MyThread(threading.Thread):
                     perfect_matches = 1
                 else:
                     perfect_matches = 0
-                self.final_gene_info[gene] = [current_gene.description, hit_count, blast_data.qcov,
+                self.final_gene_info[gene] = [current_gene.description, hit_count, blast_data.bitscore, blast_data.qcov,
                                               blast_data.pident, perfect_matches,
                                               [f"{self.target_organism}~{gene}",
                                                f"{organism}~{blast_data.blast_gene.name}"]]
@@ -85,7 +107,8 @@ def get_recips(drug, phenotype):
     # Create output file
     drug_dirs = dir_utils.DrugDirs(drug, phenotype)
     output_file = output_util.OutputFile(drug_dirs.res_recip_genes_file, header_list=["gene", "gene_description",
-                                                                                      "hit_count", "qcov_average",
+                                                                                      "hit_count", "bitscore_average",
+                                                                                      "qcov_average",
                                                                                       "pident_average",
                                                                                       "perfect_matches", "recip_genes"])
     # Get all the organisms for the phenotype
@@ -101,7 +124,7 @@ def get_recips(drug, phenotype):
     print("Original Organism: ", target_org)
 
     threads = []
-    for t in range(10):
+    for t in range(12):
         q = Queue()
         output_queue = Queue()
         threads.append(MyThread(q, output_queue, target_org, res_organisms))
@@ -113,7 +136,7 @@ def get_recips(drug, phenotype):
         threads[thread_number].queue.put(x)
 
         thread_number += 1
-        if thread_number == 10:
+        if thread_number == 12:
             thread_number = 0
 
     for t in threads:
@@ -133,7 +156,7 @@ def get_recips(drug, phenotype):
 
 
 PHENOTYPES = ["res"]
-DRUGS = ["CIPRO"]
+DRUGS = ["SULF"]
 
 for DRUG in DRUGS:
     for PHENOTYPE in PHENOTYPES:

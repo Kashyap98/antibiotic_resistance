@@ -47,7 +47,7 @@ def sort_organisms_by_phenotype():
     dir_utils.generate_dir(dir_utils.CEPRO_DIR)
     dir_utils.generate_dir(dir_utils.SULF_DIR)
 
-    data = list(csv.reader(open(dir_utils.DATA_SOURCE_FILE, 'r'), delimiter=','))
+    data = list(csv.reader(open(dir_utils.NEW_DATA_SOURCE_FILE, 'r'), delimiter=','))
     df = pd.DataFrame.from_records(data)
 
     folders = len(df.index)
@@ -68,3 +68,6 @@ def sort_organisms_by_phenotype():
         organize_organisms(cp, cepro, "cepro")
         count += 1
         print(f"Progress: {count}")
+
+
+sort_organisms_by_phenotype()

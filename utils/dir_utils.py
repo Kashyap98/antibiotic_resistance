@@ -18,6 +18,7 @@ CEPRO_DIR = os.path.join(SORTED_DATA_DIR, "CEPRO")
 
 ORGANISM_LABELS_FILE = os.path.join(MAIN_DIR, "organism_labels.csv")
 DATA_SOURCE_FILE = os.path.join(MAIN_DIR, "antibiotic_resistance_csv.csv")
+NEW_DATA_SOURCE_FILE = os.path.join(MAIN_DIR, "ResistanceInfo.csv")
 
 
 def generate_dir(in_dir):
@@ -52,6 +53,8 @@ class DrugDirs:
 
     def __init__(self, drug, phenotype):
         self.drug_dir = os.path.join(SORTED_DATA_DIR, drug)
+        self.comparison_dir = os.path.join(self.drug_dir, "comparison_dir")
+        self.homolog_dir = os.path.join(self.drug_dir, "homolog_dir")
         self.res_file = os.path.join(self.drug_dir, "res.csv")
         self.sus_file = os.path.join(self.drug_dir, "sus.csv")
         self.ind_file = os.path.join(self.drug_dir, "ind.csv")
@@ -64,6 +67,9 @@ class DrugDirs:
 
         self.res_recip_genes_file = os.path.join(self.drug_dir, f"res_recip_genes.csv")
         self.res_unique_genes_file = os.path.join(self.drug_dir, f"res_unique_genes.csv")
-
         self.res_recip_to_all_sus = os.path.join(self.drug_dir, f"res_recip_to_all_sus.csv")
 
+        self.res_to_sus_no_perfect_matches = os.path.join(self.drug_dir, f"res_to_sus_no_perfect_matches.csv")
+        self.res_to_sus_potential = os.path.join(self.drug_dir, f"res_to_sus_potential.csv")
+        self.res_to_sus_thrown_out = os.path.join(self.drug_dir, f"res_to_sus_thrown_out.csv")
+        self.potential_suspects = os.path.join(self.drug_dir, f"potential_suspects.csv")

@@ -7,7 +7,7 @@ from models.gene import Gene
 
 class BlastResult:
 
-    def __init__(self, blast_data, target_gene, blast_organism, bitscore_threshold=1000, qcov_threshold=90):
+    def __init__(self, blast_data, target_gene, blast_organism, bitscore_threshold=1000, qcov_threshold=80):
         self.gene_name = blast_data[0]
         self.bitscore_threshold = bitscore_threshold
         self.qcov_threshold = qcov_threshold
@@ -31,7 +31,7 @@ class BlastResult:
         return False
 
     def above_qcov_threshold_check(self):
-        if self.qcov > self.qcov_threshold:
+        if self.qcov >= self.qcov_threshold:
             return True
         return False
 

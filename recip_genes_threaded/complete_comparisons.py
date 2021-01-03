@@ -9,7 +9,6 @@ import pandas as pd
 
 from models import blast as b
 from models.gene import Gene
-from utils.output_util import DataOutput
 from utils.dir_utils import OrganismDirs, DrugDirs
 
 

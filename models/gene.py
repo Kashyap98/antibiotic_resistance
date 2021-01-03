@@ -32,6 +32,7 @@ class Gene:
         self.upper_length = int(self.length * 1.10)
         self.lower_length = int(self.length * 0.90)
         self.function_data = ""
+        self.match_list = []
 
         if get_info:
             gene_info = pd.read_csv(self.txt_file, error_bad_lines=False)
