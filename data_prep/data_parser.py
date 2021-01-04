@@ -81,7 +81,7 @@ def parse_tab_deliminated_info(write_nuc=None, write_prot=None, write_info=None)
 def parse_fasta_file_data():
     organism_labels = pd.read_csv(dir_utils.ORGANISM_LABELS_FILE, header=0)
     CONVERSIONS = dict(zip(list(organism_labels.iloc[:, 2]), list(organism_labels.iloc[:, 0])))
-    dir_utils.generate_dir(dir_utils.CONVERTED_NCBI_DATA_DIR)
+    dir_utils.generate_dir(dir_utils.CONVERTED_DATA_DIR)
 
     for org_file in os.listdir(dir_utils.NCBI_DATA_DIR):
         org_file_path = os.path.join(dir_utils.NCBI_DATA_DIR, org_file)
@@ -95,7 +95,7 @@ def parse_fasta_file_data():
         else:
             converted_name = f"CP-{CONVERSIONS[ncbi_label]}"
 
-        converted_org_path = os.path.join(dir_utils.CONVERTED_NCBI_DATA_DIR, converted_name)
+        converted_org_path = os.path.join(dir_utils.CONVERTED_DATA_DIR, converted_name)
         gene_folder_path = os.path.join(converted_org_path, "genes")
         dir_utils.generate_dir(converted_org_path)
         dir_utils.generate_dir(gene_folder_path)

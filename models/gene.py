@@ -2,7 +2,7 @@ import os
 
 import pandas as pd
 from Bio import SeqIO
-from utils.dir_utils import OrganismDirs
+from utils import dir_utils
 
 
 def format_gene_name(gene_name):
@@ -14,12 +14,25 @@ def format_gene_name(gene_name):
     return name
 
 
+def get_genes_from_list(organism: str, list_of_genes_names: list, remove_hypothetical=False):
+    genes = []
+    for organism_gene in list_of_genes_names:
+        gene = Gene(organism, organism_gene, get_info=False)
+        if remove_hypothetical:
+            if "hypothetical" in gene.description:
+                continue
+
+        genes.append(gene)
+
+    return genes
+
+
 # contains all the properties we care about from the fasta files/csv full of gene information
 class Gene:
 
     def __init__(self, organism, gene_name, get_info=False):
 
-        organism_dirs = OrganismDirs(organism, converted_ncbi_data=True)
+        organism_dirs = dir_utils.OrganismDirs(organism)
         self.organism = organism
         self.name = format_gene_name(gene_name)
         self.fasta_file = os.path.join(organism_dirs.gene_folder, f"{self.name}.fasta")

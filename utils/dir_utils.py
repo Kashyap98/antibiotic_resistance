@@ -7,7 +7,6 @@ ANNOTATION_DIR = os.path.join(MAIN_DIR, "annotations")
 CONVERTED_DATA_DIR = os.path.join(MAIN_DIR, "converted_data")
 SORTED_DATA_DIR = os.path.join(MAIN_DIR, "sorted_data")
 NCBI_DATA_DIR = os.path.join(MAIN_DIR, "ncbi_data")
-CONVERTED_NCBI_DATA_DIR = os.path.join(NCBI_DATA_DIR, "converted_ncbi_data")
 
 # Drug constants
 FOSF_DIR = os.path.join(SORTED_DATA_DIR, "FOSF")
@@ -35,14 +34,14 @@ def cp_umb_dir_fixer(cp):
         return cp
 
 
+def strip_extension(file_name: str) -> str:
+    return file_name.split(".")[0]
+
 class OrganismDirs:
 
-    def __init__(self, organism, converted_ncbi_data=False):
+    def __init__(self, organism):
         self.organism = organism
-        if converted_ncbi_data:
-            self.organism_folder = os.path.join(CONVERTED_NCBI_DATA_DIR, cp_umb_dir_fixer(organism))
-        else:
-            self.organism_folder = os.path.join(CONVERTED_DATA_DIR, cp_umb_dir_fixer(organism))
+        self.organism_folder = os.path.join(CONVERTED_DATA_DIR, cp_umb_dir_fixer(organism))
 
         self.gene_folder = os.path.join(self.organism_folder, "genes")
         self.gene_info_folder = os.path.join(self.organism_folder, "gene_info")
@@ -53,8 +52,8 @@ class DrugDirs:
 
     def __init__(self, drug, phenotype):
         self.drug_dir = os.path.join(SORTED_DATA_DIR, drug)
-        self.comparison_dir = os.path.join(self.drug_dir, "comparison_dir")
-        self.homolog_dir = os.path.join(self.drug_dir, "homolog_dir")
+        self.unique_res_genes = os.path.join(self.drug_dir, "unique_res_genes")
+        self.reciprocal_res_genes = os.path.join(self.drug_dir, "reciprocal_res_genes")
         self.res_file = os.path.join(self.drug_dir, "res.csv")
         self.sus_file = os.path.join(self.drug_dir, "sus.csv")
         self.ind_file = os.path.join(self.drug_dir, "ind.csv")
