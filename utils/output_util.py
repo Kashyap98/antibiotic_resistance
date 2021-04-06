@@ -1,5 +1,3 @@
-import os
-import utils.dir_utils as dir_utils
 
 
 def get_string_for_info(info):
@@ -12,11 +10,12 @@ def get_string_for_info(info):
 
 class OutputFile:
 
-    def __init__(self, file_path=None, header_list=None):
+    def __init__(self, file_path=None, header_list=None, overwrite_file=True):
         self.file_path = file_path
         self.header_list = header_list
 
-        self.init_output_file()
+        if overwrite_file:
+            self.init_output_file()
 
     def init_output_file(self):
 

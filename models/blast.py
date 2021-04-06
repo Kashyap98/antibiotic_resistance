@@ -8,7 +8,7 @@ from utils import dir_utils
 
 class BlastResult:
 
-    def __init__(self, blast_data, blasted_gene, blast_organism, bitscore_threshold=1000, qcov_threshold=80):
+    def __init__(self, blast_data, blasted_gene, blast_organism, bitscore_threshold=0, qcov_threshold=80):
         self.gene_name = blast_data[0]
         self.bitscore_threshold = bitscore_threshold
         self.qcov_threshold = qcov_threshold
@@ -17,13 +17,14 @@ class BlastResult:
 
         self.match_length = int(blast_data[1])
         self.bitscore = int(float(bitscore_fixer(blast_data, blast_data[2])))
-        self.qcov = int(bitscore_fixer(blast_data, blast_data[3]))
-        self.pident = float(bitscore_fixer(blast_data, blast_data[4]))
+        self.qcov = int(float(bitscore_fixer(blast_data, blast_data[3])))
+        self.pident = int(float(bitscore_fixer(blast_data, blast_data[4])))
         self.match_ratio = float(round(int(self.match_length) / int(self.target_gene.length), 2))
 
-        self.is_perfect_match = bool(int(self.qcov == 100) and int(self.pident == 100))
+        self.is_perfect_match = bool((self.qcov == 100) and (self.pident == 100))
         self.is_homolog = bool(self.above_bitscore_threshold_check() and self.within_size_constraints_check()
                                and self.above_qcov_threshold_check())
+        self.is_homolog = bool(self.above_bitscore_threshold_check() and self.above_qcov_threshold_check())
 
     def above_bitscore_threshold_check(self):
         if self.bitscore >= self.bitscore_threshold:
@@ -43,9 +44,10 @@ class BlastResult:
 
 class CombinedResult:
 
-    def __init__(self, gene_name: str, gene_description: str):
-        self.gene_name = gene_name
-        self.gene_description = gene_description
+    def __init__(self, gene: Gene):
+        self.gene = gene
+        self.gene_name = self.gene.name
+        self.gene_description = self.gene.description
         self.results = 0
 
         self.bitscore_average = None
@@ -54,9 +56,13 @@ class CombinedResult:
 
         self.match_count = 0
         self.perfect_match_count = 0
-
         self.match_organisms = []
         self.perfect_match_organisms = []
+        
+        self.sus_match_count = 0
+        self.sus_perfect_match_count = 0
+        self.sus_match_organisms = []
+        self.sus_perfect_match_organisms = []
 
     def add_new_result(self, result: BlastResult):
         if self.results == 0:
@@ -75,16 +81,39 @@ class CombinedResult:
         else:
             self.match_count += 1
             self.match_organisms.append(result.blast_gene.organism)
+
+    def add_new_sus_result(self, result: BlastResult):
+        if result.is_perfect_match:
+            self.sus_perfect_match_count += 1
+            self.sus_perfect_match_organisms.append(result.blast_gene.organism)
+        else:
+            self.sus_match_count += 1
+            self.sus_match_organisms.append(result.blast_gene.organism)
             
     def header(self):
-        return ["gene_name", "gene_description", "match_count", "perfect_match_count", "bitscore_average",
-                "qcov_average", "pident_average", "match_organisms", "perfect_match_organisms"]
+        return ["organism", "gene_name", "gene_description", "match_count", "perfect_match_count", "bitscore_average",
+                "qcov_average", "pident_average", "match_organisms", "perfect_match_organisms", "sus_match_organisms",
+                "sus_perfect_match_organisms"]
             
     def data(self):
-        return [self.gene_name, self.gene_description, self.match_count, self.perfect_match_count,
+        return [self.gene.organism, self.gene_name, self.gene_description, self.match_count, self.perfect_match_count,
                 self.bitscore_average, self.qcov_average, self.pident_average, self.match_organisms,
-                self.perfect_match_organisms]
-            
+                self.perfect_match_organisms, self.sus_match_organisms, self.sus_perfect_match_organisms]
+
+
+class UniqueGeneCompareResult(CombinedResult):
+
+    def __init__(self, gene: Gene, unique_group: set, not_unique_group: set):
+        super(UniqueGeneCompareResult, self).__init__(gene)
+
+    def header(self):
+        return ["organism", "gene_name", "gene_description", "unique_matches", "unique_perfect_matches",
+                "not_unique_matches", "not_unique_perfect_matches"]
+
+    def data(self):
+        return [self.gene.organism, self.gene_name, self.gene_description, self.match_organisms,
+                self.perfect_match_organisms, self.sus_match_organisms, self.sus_perfect_match_organisms]
+
 
 def bitscore_fixer(result, bitscore):
     if len(result) > 3:

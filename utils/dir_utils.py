@@ -18,6 +18,7 @@ CEPRO_DIR = os.path.join(SORTED_DATA_DIR, "CEPRO")
 ORGANISM_LABELS_FILE = os.path.join(MAIN_DIR, "organism_labels.csv")
 DATA_SOURCE_FILE = os.path.join(MAIN_DIR, "antibiotic_resistance_csv.csv")
 NEW_DATA_SOURCE_FILE = os.path.join(MAIN_DIR, "ResistanceInfo.csv")
+USEARCH = os.path.join(MAIN_DIR, "usearch.exe")
 
 
 def generate_dir(in_dir):
@@ -36,6 +37,7 @@ def cp_umb_dir_fixer(cp):
 
 def strip_extension(file_name: str) -> str:
     return file_name.split(".")[0]
+
 
 class OrganismDirs:
 
@@ -72,3 +74,8 @@ class DrugDirs:
         self.res_to_sus_potential = os.path.join(self.drug_dir, f"res_to_sus_potential.csv")
         self.res_to_sus_thrown_out = os.path.join(self.drug_dir, f"res_to_sus_thrown_out.csv")
         self.potential_suspects = os.path.join(self.drug_dir, f"potential_suspects.csv")
+
+        self.sequences_to_cluster = os.path.join(self.drug_dir, f"sequences_to_cluster.fasta")
+        self.centroids = os.path.join(self.drug_dir, f"centroids.fasta")
+        self.cluster_uc = os.path.join(self.drug_dir, f"clusters.uc")
+        self.cluster_dir = os.path.join(self.drug_dir, f"clusters")
