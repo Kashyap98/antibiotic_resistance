@@ -1,9 +1,12 @@
 import csv
 import multiprocessing
 import os
+from typing import Dict, List
+
 import pandas as pd
 
 from models import gene
+from models.gene import Gene
 from utils import dir_utils
 
 
@@ -37,9 +40,11 @@ def get_organisms_by_phenotype(organism_path):
     return all_organisms
 
 
-def get_organism_and_all_genes_from_folder_csv(folder_path: str, remove_hypothetical=False) -> dict:
+def get_organism_and_all_genes_from_folder_csv(folder_path: str, remove_hypothetical=False) -> Dict[str, List[Gene]]:
     organisms = os.listdir(folder_path)
     all_genes = {}
+
+    # go through each organism and create Gene objects for their genes.
     for organism in organisms:
         print(f"Gathering genes for organism: {organism}")
         organism_csv = pd.read_csv(os.path.join(folder_path, organism), header=0)

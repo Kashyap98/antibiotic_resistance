@@ -60,20 +60,10 @@ class DrugDirs:
         self.sus_file = os.path.join(self.drug_dir, "sus.csv")
         self.ind_file = os.path.join(self.drug_dir, "ind.csv")
 
-        self.target_phenotype = phenotype
-        self.opposite_phenotype = gen_utils.get_op_phenotype(phenotype)
-
-        self.target_phenotype_file = os.path.join(self.drug_dir, f"{self.target_phenotype}.csv")
-        self.op_phenotype_file = os.path.join(self.drug_dir, f"{self.opposite_phenotype}.csv")
-
-        self.res_recip_genes_file = os.path.join(self.drug_dir, f"res_recip_genes.csv")
-        self.res_unique_genes_file = os.path.join(self.drug_dir, f"res_unique_genes.csv")
-        self.res_recip_to_all_sus = os.path.join(self.drug_dir, f"res_recip_to_all_sus.csv")
-
-        self.res_to_sus_no_perfect_matches = os.path.join(self.drug_dir, f"res_to_sus_no_perfect_matches.csv")
-        self.res_to_sus_potential = os.path.join(self.drug_dir, f"res_to_sus_potential.csv")
-        self.res_to_sus_thrown_out = os.path.join(self.drug_dir, f"res_to_sus_thrown_out.csv")
-        self.potential_suspects = os.path.join(self.drug_dir, f"potential_suspects.csv")
+        self.potential_uniques = os.path.join(self.drug_dir, f"potential_uniques.csv")
+        self.investigated_unique_genes = os.path.join(self.drug_dir, "investigated_unique_genes.csv")
+        self.cluster_info = os.path.join(self.drug_dir, "cluster_info.csv")
+        self.unique_clusters = os.path.join(drug_dirs.drug_dir, "unique_clusters.csv")
 
         self.sequences_to_cluster = os.path.join(self.drug_dir, f"sequences_to_cluster.fasta")
         self.centroids = os.path.join(self.drug_dir, f"centroids.fasta")
