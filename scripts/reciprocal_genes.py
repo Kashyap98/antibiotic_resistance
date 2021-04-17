@@ -1,7 +1,7 @@
 import os
 
-from utils import dir_utils, gen_utils, output_util
 from models import blast, gene
+from utils import dir_utils, gen_utils, output_util
 
 DRUG = "SULF"
 PHENOTYPE = "res"

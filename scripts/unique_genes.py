@@ -1,11 +1,11 @@
-from collections import defaultdict
 import os
+from collections import defaultdict
 from typing import List, Optional, Dict, Any
 
-from models.gene import Gene
-from utils import dir_utils, gen_utils, output_util
 from models import blast
 from models import gene as gene_utils
+from models.gene import Gene
+from utils import dir_utils, gen_utils, output_util
 
 DRUG = "SULF"
 PHENOTYPE = "res"
@@ -19,7 +19,7 @@ def gather_filtered_potential_unique_genes(drug_dirs: dir_utils.DrugDirs,
     """
     Takes in a dictionary of key gene with a list of genes that are related and unique to the key gene.
     This function will determine if any are needed to be filtered for collection or filtered for removal. Otherwise,
-    all genes will eb taken.
+    all genes will be taken.
     """
     final_gene_output = {}
     potential_combinations = gather_potential_unique_combinations(drug_dirs, write_output)
@@ -28,13 +28,7 @@ def gather_filtered_potential_unique_genes(drug_dirs: dir_utils.DrugDirs,
     for gene, gene_list in potential_combinations.items():
 
         if len(genes_to_collect) > 0:
-            should_collect_gene = False
-
-            # make sure it is a gene we are interested in
-            for gene_to_collect in genes_to_collect:
-                if gene_to_collect in gene:
-                    should_collect_gene = True
-                    break
+            should_collect_gene = gen_utils.check_if_gene_in_keyword_list(gene, genes_to_collect)
         else:
             should_collect_gene = True
 
@@ -150,7 +144,7 @@ def gather_potential_unique_combinations(drug_dirs: dir_utils.DrugDirs,
 
 
 def get_unique_genes_for_organism(res_organism: str, res_genes: List[Gene],
-                                  sus_organisms: List[str],  drug_dirs: dir_utils.DrugDirs):
+                                  sus_organisms: List[str], drug_dirs: dir_utils.DrugDirs):
     """
     This function compares the genes of one resistant organism to all susceptible organisms and their genes.
     The list of unique genes is then outputted.

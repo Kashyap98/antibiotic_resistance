@@ -1,11 +1,9 @@
-
+from scripts import unique_genes
 from utils import dir_utils, gen_utils
-from refactored import unique_genes
 
 DRUG = "CEPRO"
 PHENOTYPE = "res"
 MAX_PROCESSES = 4
-
 
 if __name__ == '__main__':
     drug_dirs = dir_utils.DrugDirs(DRUG, PHENOTYPE)

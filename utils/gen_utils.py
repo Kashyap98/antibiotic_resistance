@@ -4,6 +4,7 @@ import os
 from typing import Dict, List
 
 import pandas as pd
+from Bio import SeqIO
 
 from models import gene
 from models.gene import Gene
@@ -65,7 +66,7 @@ def get_all_genes_for_list_of_organisms(organisms: list, remove_hypothetical=Fal
     return all_genes
 
 
-def get_all_genes_for_organism(organism: str, remove_hypothetical=False) -> list:
+def get_all_genes_for_organism(organism: str, remove_hypothetical=False) -> List[Gene]:
     organism_dir = dir_utils.OrganismDirs(organism)
     all_genes = gene.get_genes_from_list(organism=organism, list_of_genes_names=os.listdir(organism_dir.gene_folder),
                                          remove_hypothetical=remove_hypothetical)
@@ -73,7 +74,16 @@ def get_all_genes_for_organism(organism: str, remove_hypothetical=False) -> list
     return all_genes
 
 
-if __name__ == '__main__':
-    genes = get_all_genes_for_organism("CP-49")
-    for gene in genes:
-        print(gene.description)
+def get_list_of_genes_from_fasta_file(organism_file_path: str) -> List[SeqIO.SeqRecord]:
+    gene_list = list(SeqIO.parse(open(organism_file_path, "r"), "fasta"))
+    return gene_list
+
+
+def check_if_gene_in_keyword_list(gene_to_check: Gene, genes_to_collect: List[str]) -> bool:
+    should_collect_gene = False
+    # make sure it is a gene we are interested in
+    for gene_to_collect in genes_to_collect:
+        if gene_to_collect in str(gene_to_check):
+            should_collect_gene = True
+            break
+    return should_collect_gene

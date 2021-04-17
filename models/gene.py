@@ -9,9 +9,9 @@ from utils import dir_utils
 
 class Gene:
 
-    def __init__(self, organism, gene_name, get_info=False):
+    def __init__(self, organism, gene_name, get_info=False, new_organism=False):
 
-        organism_dirs = dir_utils.OrganismDirs(organism)
+        organism_dirs = dir_utils.OrganismDirs(organism, new_organism)
         self.organism = organism
         self.name = format_gene_name(gene_name)
         self.fasta_file = os.path.join(organism_dirs.gene_folder, f"{self.name}.fasta")

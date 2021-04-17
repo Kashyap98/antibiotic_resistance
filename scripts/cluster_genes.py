@@ -6,7 +6,6 @@ from Bio.SeqRecord import SeqRecord
 
 from models import gene
 from models.gene import Gene
-
 from utils import gen_utils, dir_utils, output_util
 
 DRUG = "CEPRO"
@@ -23,7 +22,7 @@ def _get_gene_clusters(folder_path: str) -> Dict[str, List[SeqRecord]]:
 
     for cluster in clusters:
         print(f"Gathering genes for cluster: {cluster}")
-        cluster_info = list(SeqIO.parse(open(os.path.join(folder_path, cluster), "r"), "fasta"))
+        cluster_info = gen_utils.get_list_of_genes_from_fasta_file(os.path.join(folder_path, cluster))
         all_clusters[cluster] = cluster_info
 
     return all_clusters
